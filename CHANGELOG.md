@@ -8,19 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Automated AUR (Arch User Repository) publishing via GitHub Actions - eliminates 7 manual steps per release
-- WinGet support for Windows package manager with automated PR creation to microsoft/winget-pkgs
-- Standalone Scoop publishing workflow for better maintainability
+- Automated AUR, WinGet, and Scoop publishing via GitHub Actions
+- Warn when formula cells are blank due to uncached xlsx values (`NOTE:` before table, suggests `--formulas` or re-saving in Excel/LibreOffice)
 
 ### Changed
-- Nix flake now dynamically reads version from Cargo.toml instead of hardcoded value
-- Split Scoop publishing into separate workflow (`.github/workflows/publish-scoop.yml`)
-- Removed `allow-dirty` configuration from cargo-dist setup, enabling safe upgrades
-- Updated all release documentation to reflect fully automated process
+- Nix flake version now read dynamically from Cargo.toml; homepage URL fixed
+- Replaced `prettytable-rs` with `comfy-table` for non-interactive output, enabling correct multiline cell wrapping with `--wrap` ([#44](https://github.com/bgreenwell/xleak/pull/44))
+- Non-interactive table output: green bold headers, red errors, green formula-mode cells
 
 ### Fixed
-- Nix flake homepage URL now correctly points to bgreenwell/xleak (was greenwbm/xleak)
-- Nix flake version now stays in sync with Cargo.toml automatically
+- AUR `xleak-bin` PKGBUILD: `package()` missing `cd "$srcdir/..."` caused install failures
+- `?` help keybinding not firing on macOS — macOS terminals omit SHIFT for symbol chars
+- Formulas fixture: `Formula` column now shows expression text; `Result` holds the live formula
 
 ## [0.2.5] - 2025-12-04
 

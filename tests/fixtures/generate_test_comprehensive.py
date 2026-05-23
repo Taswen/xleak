@@ -48,29 +48,34 @@ def create_formulas_sheet(wb):
     # Headers
     ws.append(["Formula Type", "Formula", "Result", "Description"])
 
-    # Sample data
+    # Sample data used by the formulas below
     ws.append(["Data", 10, None, "Sample values"])
     ws.append(["Data", 20, None, None])
     ws.append(["Data", 30, None, None])
     ws.append(["Data", 40, None, None])
     ws.append(["Data", 50, None, None])
 
-    # Arithmetic formulas
-    ws.append(["SUM", "=SUM(B2:B6)", None, "Sum of range"])
-    ws.append(["AVERAGE", "=AVERAGE(B2:B6)", None, "Average of range"])
-    ws.append(["MIN", "=MIN(B2:B6)", None, "Minimum value"])
-    ws.append(["MAX", "=MAX(B2:B6)", None, "Maximum value"])
-    ws.append(["COUNT", "=COUNT(B2:B6)", None, "Count numbers"])
+    # Each row: Formula column is the expression as display text (quotePrefix so
+    # Excel treats it as a string, not a formula); Result column holds the actual
+    # Excel formula so its computed value is visible once the file is saved.
+    # Formula column: plain text label (no leading = so openpyxl stores it as a string)
+    # Result column: the actual Excel formula whose computed value xleak displays
+    formulas = [
+        ("SUM",     "SUM(B2:B6)",             "=SUM(B2:B6)",            "Sum of range"),
+        ("AVERAGE", "AVERAGE(B2:B6)",          "=AVERAGE(B2:B6)",        "Average of range"),
+        ("MIN",     "MIN(B2:B6)",              "=MIN(B2:B6)",            "Minimum value"),
+        ("MAX",     "MAX(B2:B6)",              "=MAX(B2:B6)",            "Maximum value"),
+        ("COUNT",   "COUNT(B2:B6)",            "=COUNT(B2:B6)",          "Count numbers"),
+        ("IF",      'IF(B2>15,"High","Low")',  '=IF(B2>15,"High","Low")',"Conditional"),
+        ("AND",     "AND(B2>5,B2<15)",         "=AND(B2>5,B2<15)",       "Logical AND"),
+        ("OR",      "OR(B2>100,B2<5)",         "=OR(B2>100,B2<5)",       "Logical OR"),
+        ("ROUND",   "ROUND(3.14159,2)",        "=ROUND(3.14159,2)",      "Round to 2 decimals"),
+        ("ABS",     "ABS(-42)",                "=ABS(-42)",              "Absolute value"),
+        ("SQRT",    "SQRT(144)",               "=SQRT(144)",             "Square root"),
+    ]
 
-    # Logic formulas
-    ws.append(["IF", "=IF(B2>15,\"High\",\"Low\")", None, "Conditional"])
-    ws.append(["AND", "=AND(B2>5,B2<15)", None, "Logical AND"])
-    ws.append(["OR", "=OR(B2>100,B2<5)", None, "Logical OR"])
-
-    # Math formulas
-    ws.append(["ROUND", "=ROUND(3.14159,2)", None, "Round to 2 decimals"])
-    ws.append(["ABS", "=ABS(-42)", None, "Absolute value"])
-    ws.append(["SQRT", "=SQRT(144)", None, "Square root"])
+    for formula_type, expr_text, formula, description in formulas:
+        ws.append([formula_type, expr_text, formula, description])
 
     return ws
 

@@ -1,130 +1,63 @@
-# xleak - AI Agent Instructions
+# xleak
 
 Excel terminal viewer written in Rust with TUI, search, formulas, and export capabilities.
 
-**Tech Stack:** Rust 2024, calamine, clap, ratatui + crossterm, anyhow, prettytable-rs, arboard, chrono
-
-**Formats:** `.xlsx`, `.xls`, `.xlsm`, `.xlsb`, `.ods`
-
+**Stack:** Rust 2024, calamine, clap, ratatui + crossterm, anyhow, comfy-table, arboard, chrono  
+**Formats:** `.xlsx`, `.xls`, `.xlsm`, `.xlsb`, `.ods`  
 **Key files:** `main.rs`, `workbook.rs`, `tui.rs`, `display.rs` in `src/`
 
-## Quick Start
+## Commands
 
-Standard Rust commands: `cargo build`, `cargo test`, `cargo clippy`, `cargo fmt`
-
-**Run with test fixtures:**
 ```bash
+cargo fmt && cargo clippy && cargo build --release
 cargo run -- tests/fixtures/test_comprehensive.xlsx -i
+cargo run -- tests/fixtures/test_comprehensive.xlsx --sheet Formulas --export csv
+cd tests/fixtures && uv run python generate_all_tests.py   # regenerate fixtures
+cargo install --path .                                      # install globally
 ```
-
-**Generate test data:**
-```bash
-source .venv/bin/activate
-cd tests/fixtures && python generate_all_tests.py
-```
-
-## Code Style
-
-- **Format:** `cargo fmt` (default rustfmt), address all `cargo clippy` warnings
-- **Error handling:** Use `anyhow::Result<T>` with `.context()` for error messages
-- **Comments:** Minimal, focus on "why" not "what", doc comments for public APIs
-- **Pattern matching:** Exhaustive for `CellValue` enum
 
 ## Architecture
 
-**Module responsibilities:**
-- `main.rs` - CLI parsing, orchestration
-- `workbook.rs` - Excel I/O, data extraction (calamine wrapper)
-- `tui.rs` - Interactive TUI state and rendering (ratatui)
-- `display.rs` - Output formatting (terminal, CSV, JSON, text)
+- `main.rs` — CLI parsing, orchestration
+- `workbook.rs` — Excel I/O, data extraction (calamine)
+- `tui.rs` — Interactive TUI state and rendering (ratatui)
+- `display.rs` — Non-interactive output (terminal, CSV, JSON, text) via comfy-table
 
-**Key dependencies:**
-- `calamine` - Excel parsing, `clap` - CLI framework
-- `ratatui` + `crossterm` - TUI, `anyhow` - Error handling
-- `prettytable-rs` - Non-interactive display, `arboard` - Clipboard
+## Code Style
 
-**Implemented features:** Interactive TUI, search, formulas, clipboard, lazy loading, multi-sheet nav, cell jump, horizontal scrolling
+- Fix all `cargo clippy` warnings; run `cargo fmt` before committing
+- Error handling: `anyhow::Result<T>` with `.context()` for messages
+- Comments: only when "why" is non-obvious; doc comments for public APIs
+- `CellValue` enum: exhaustive pattern matching required
+- Use `--release` for performance testing; use `-n` to limit rows on large files
 
-## Error Handling
+## Common Patterns
 
-Use `anyhow` with contextual messages:
-```rust
-wb.load_sheet(&sheet_name)
-    .with_context(|| format!("Failed to load sheet '{sheet_name}'"))?;
-```
+- **New CLI option:** field on `Cli` in `main.rs`, clap macros, handle in `main()`
+- **New export format:** `export_<format>()` in `display.rs`, match arm in `main()`
+- **Fix display:** `display_table()` in `display.rs`, test with DataTypes sheet
+- **New cell type:** `CellValue` enum in `workbook.rs`, impl `Display`, update `datatype_to_cellvalue()`
 
-## Performance
+## Development
 
-Use `--release` builds for testing. Cargo.toml configured for max optimization (opt-level=3, lto=true). For large files, use `-n` limit.
+Conventional commits: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`.  
+Feature branches → PR to `main`. Direct commits: releases, hotfixes, minor docs only.
 
-## Development Workflow
+**PR checklist:**
+- [ ] Compiles, no clippy warnings, `cargo fmt` clean
+- [ ] Tested with fixtures (multiple formats: .xlsx, .xls, .ods)
+- [ ] README.md updated (user-facing) or AGENTS.md (architecture changes)
+- [ ] Concise entry added to CHANGELOG.md under `[Unreleased]`
 
-**Branching:**
-- Create feature branches for new features: `feature/add-csv-support`
-- Create bugfix branches for fixes: `fix/windows-help-popup`
-- Submit pull requests to `main` branch
-- Direct commits to `main` allowed only for: releases, hotfixes, minor docs
+**Changelog style:** One line per item, no filler words. Bad: `"Formula cells are now detected and a warning is shown to inform users that..."`. Good: `"Warn when formula cells are blank due to uncached xlsx values"`.
 
-**Commit Guidelines:**
+## Release
 
-Use conventional commits: `type: description` where type is `feat`, `fix`, `docs`, `refactor`, `test`, or `chore`.
+All distribution channels automated via cargo-dist. See [RELEASE_CHECKLIST.md](./RELEASE_CHECKLIST.md).
 
-**PR Checklist:**
-- [ ] Code compiles, no clippy warnings, formatted
-- [ ] Tested with fixtures and real Excel files
-- [ ] Updated README.md (if user-facing) or AGENTS.md (if architecture changes)
+- `.github/workflows/release.yml` — GitHub Releases, Homebrew, crates.io
+- `.github/workflows/publish-scoop.yml` — Scoop
+- `.github/workflows/publish-aur.yml` — AUR
+- `.github/workflows/publish-winget.yml` — WinGet
 
-## Common Patterns (For AI Agents)
-
-**Adding CLI option:** Add field to `Cli` struct in `main.rs`, add clap macros, handle in `main()`
-
-**Adding export format:** Create `export_<format>()` in `display.rs`, add match case in `main.rs`
-
-**Fixing display:** Check `display_table()` in `display.rs`, test with DataTypes sheet
-
-**New cell type:** Add to `CellValue` enum in `workbook.rs`, implement `Display`, update `datatype_to_cellvalue()`
-
-## Useful Commands Reference
-
-```bash
-# Full development cycle
-cargo fmt && cargo clippy && cargo build --release
-
-# Quick iteration
-cargo check && cargo run -- tests/fixtures/test_comprehensive.xlsx -i
-
-# View specific sheet
-cargo run -- tests/fixtures/test_tables.xlsx --sheet EmployeesTable
-
-# Test exports
-cargo run -- tests/fixtures/test_comprehensive.xlsx --export csv > test.csv
-cargo run -- tests/fixtures/test_comprehensive.xlsx --export json > test.json
-
-# Performance check (release mode is crucial)
-time ./target/release/xleak tests/fixtures/test_large.xlsx
-
-# Install globally after changes
-cargo install --path .
-```
-
-## Release Process
-
-xleak uses cargo-dist for automated releases. All distribution channels are now automated. See [RELEASE_CHECKLIST.md](./RELEASE_CHECKLIST.md) for complete instructions. Create a GitHub issue using the "Release" template to track progress.
-
-**Distribution channels:**
-- GitHub Releases, Homebrew, Scoop, WinGet, crates.io, AUR (all automated)
-
-**Workflows:**
-- `.github/workflows/release.yml` - Main release, Homebrew, crates.io
-- `.github/workflows/publish-scoop.yml` - Scoop bucket
-- `.github/workflows/publish-aur.yml` - AUR repository
-- `.github/workflows/publish-winget.yml` - WinGet manifests
-
-## Questions or Issues?
-
-If implementing features:
-1. Check .planning/ (local directory, not tracked in git) for any planning documents
-2. Review existing code patterns before adding new patterns
-3. Keep changes minimal and focused
-4. Prefer editing existing files over creating new ones
-5. Test with fixtures in tests/fixtures/ covering multiple formats (.xlsx, .xls, .ods)
+Check `.planning/` (untracked) for planning docs before starting large features.

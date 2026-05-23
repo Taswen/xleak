@@ -1,33 +1,22 @@
-# Rust/Cargo
+# Rust
 /target
 **/*.rs.bk
 *.pdb
-# Note: Cargo.lock IS committed for binary crates (applications)
 
-# Test files
+# Test/generated files
 *.xlsx
 *.xls
 *.xlsm
 *.xlsb
 *.ods
 *.csv
-
-# Deprecated test files
 tests/fixtures/deprecated/
 
 # macOS
 .DS_Store
-.AppleDouble
-.LSOverride
-
-# Linux
-*~
-.nfs*
 
 # Windows
 Thumbs.db
-ehthumbs.db
-Desktop.ini
 
 # IDEs
 .vscode/
@@ -35,20 +24,8 @@ Desktop.ini
 *.swp
 *.swo
 *~
-.project
-.classpath
-.settings/
 
-# R (legacy from user's setup)
-.Rhistory
-.RData
-.Rproj.user
-
-# Backup files
-*.bak
-*.tmp
-*.old
-
-# Planning documents (local only)
+# Local
+CLAUDE.md
 .planning/
 scoop-bucket/
