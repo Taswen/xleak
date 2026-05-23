@@ -562,6 +562,23 @@ mod tests {
     }
 
     #[test]
+    fn test_cellvalue_to_raw_string_large_float() {
+        // Regression: large whole-number floats were exported with thousands separators
+        // (e.g. "18,441,600,422") making CSV/text output unparseable as numbers (#34)
+        let val = CellValue::Float(18_441_600_422.0);
+        assert_eq!(val.to_raw_string(), "18441600422");
+        // Display (TUI) formatting should still use separators
+        assert_eq!(val.to_string(), "18,441,600,422");
+    }
+
+    #[test]
+    fn test_cellvalue_to_raw_string_large_int() {
+        let val = CellValue::Int(18_441_600_422);
+        assert_eq!(val.to_raw_string(), "18441600422");
+        assert_eq!(val.to_string(), "18,441,600,422");
+    }
+
+    #[test]
     fn test_cellvalue_is_empty() {
         assert!(CellValue::Empty.is_empty());
         assert!(!CellValue::Int(0).is_empty());

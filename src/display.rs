@@ -194,8 +194,8 @@ pub fn export_csv(data: &SheetData) -> Result<()> {
         let row_str: Vec<String> = row
             .iter()
             .map(|cell| {
-                let val = cell.to_string();
-                if val.contains(',') || val.contains('"') {
+                let val = cell.to_raw_string();
+                if val.contains(',') || val.contains('"') || val.contains('\n') {
                     format!("\"{}\"", val.replace('"', "\"\""))
                 } else {
                     val
@@ -255,7 +255,7 @@ pub fn export_text(data: &SheetData) -> Result<()> {
 
     // Data rows
     for row in &data.rows {
-        let row_str: Vec<String> = row.iter().map(|cell| cell.to_string()).collect();
+        let row_str: Vec<String> = row.iter().map(|cell| cell.to_raw_string()).collect();
         println!("{}", row_str.join("\t"));
     }
 
