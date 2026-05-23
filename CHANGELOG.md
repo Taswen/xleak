@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Non-interactive table output: green bold headers, red errors, green formula-mode cells
 
 ### Fixed
+- CSV and text export wrote large numbers with thousands separators (e.g. `"18,441,600,422"` instead of `18441600422`), making them unparseable as numbers ([#34](https://github.com/bgreenwell/xleak/issues/34))
 - AUR `xleak-bin` PKGBUILD: `package()` missing `cd "$srcdir/..."` caused install failures
 - `?` help keybinding not firing on macOS — macOS terminals omit SHIFT for symbol chars
 - Formulas fixture: `Formula` column now shows expression text; `Result` holds the live formula
