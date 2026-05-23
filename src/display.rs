@@ -3,6 +3,8 @@ use anyhow::Result;
 use comfy_table::{
     Attribute, Cell, CellAlignment, Color, ColumnConstraint, ContentArrangement, Row, Table, Width,
 };
+use crossterm::style::Stylize;
+use std::io::IsTerminal;
 
 /// Format a cell value with width limiting
 fn format_cell_value(value: &str, max_width: usize, wrap: bool) -> String {
@@ -80,7 +82,12 @@ pub fn display_table(
                 })
                 .sum();
             if blank_formula_count >= 2 {
-                println!("NOTE: Formula cells empty (not cached). Try --formulas or opening/saving in Excel/LibreOffice to cache the results.");
+                let prefix = if std::io::stdout().is_terminal() {
+                    format!("{}", "NOTE:".bold().yellow())
+                } else {
+                    "NOTE:".to_string()
+                };
+                println!("{prefix} Formula cells empty (not cached). Try --formulas or opening/saving in Excel/LibreOffice to cache the results.");
             }
         }
     }
