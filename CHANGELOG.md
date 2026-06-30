@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- OSC 52 clipboard support: `c`/`C` now copy via OSC 52 (works over SSH) in addition to the system clipboard
+- CSV/TSV support: read and interactively view `.csv`/`.tsv` files as a single sheet (behind the default-on `csv` feature)
+- `--csv-delimiter` option to override the inferred CSV/TSV field delimiter
+- `--no-header` flag to treat first row as data (generates A, B, C... column headers)
+- `--no-column-id` flag to hide the column-letter row (A, B, C...) in interactive mode
+- `--no-row-id` flag to hide the row-number column in interactive mode
+- Per-sheet cursor position memory: switching back to a sheet restores the previous cell and scroll position
+- `--color`/`--no-color` flags to force or disable colored output
+- `--delimiter` option for custom CSV/text export separators (e.g., `-d ";"`)
+- File type detection with helpful error messages for unknown formats
+- OLE2 (.xls) magic byte detection in file type checker
+- Integration tests covering CLI, exports, tables, CSV/TSV, edge cases, and error handling
+
+### Changed
+- Refactored `tui.rs` (2223 lines) into modular `tui/` crate: `theme.rs`, `state.rs`, `rendering.rs`, `event.rs`, `clipboard.rs`
+- Split `display.rs` into a `display/` module: `sheet.rs`, `table.rs`, `export.rs` (shared CSV-quoting and JSON helpers deduplicated)
+- Interactive mode shows a sticky column-letter row and row-number column
+- Sheet name (top-left) and `rows×cols` dimensions (top-right) are shown on the table's top border, color-differentiated from the headers
+- Info bar left side shows the cell address (plus the live search query while searching); theme and key hints are right-aligned
+- Status bar shows the current cell value, wrapping onto extra lines (up to 3/4 of the terminal height) when too long
+- Moved `TableData` export/display functions from `main.rs` to the `display` module, eliminating code duplication
+- Extracted `build_formula_grid()` and `format_datetime()` helpers to reduce formula and datetime logic duplication
+- `main.rs` reduced from ~350 to ~180 lines
+- Upgraded dependencies: `calamine` 0.34→0.35, `ratatui` 0.29→0.30, `crossterm` 0.28→0.29, `toml` 0.8→1.1
+
+### Fixed
+- `display_table_data` now respects `--max-width` CLI flag instead of hardcoded 30
+- Display corruption when switching sheets in interactive mode (removed `eprintln!` writes during raw mode)
+- macOS: silence NSPasteboard stderr diagnostics during clipboard writes that corrupted the TUI
+
 ## [0.2.6] - 2026-05-24
 
 ### Added
